@@ -1,16 +1,15 @@
-# BYD Font Viewer
+# Cheap Yellow Display Font Viewer
 
-This is a simple font browser for the APKLVSR/BuyDisplay-style 2.8" 320x240 ESP32 touchscreen board from your Amazon link. It runs in landscape, displays the full printable ASCII range for one font at a time, and advances to the next font whenever the screen is pressed.
+This is a simple font browser which should work on any CYD board. (Tested on a ESP32-2432S028). It runs in landscape, displays the full printable ASCII range for one font at a time, and advances to the next font whenever the screen is pressed.
 
 ## Hardware config
 
-- Reuses the working board setup from `../HouseStatusDisplay`
 - `esp32dev` PlatformIO target
 - `LovyanGFX` display stack
 - `Panel_ILI9342` in landscape mode (`320x240`)
-- `XPT2046` touch with the same calibration and pins as the sibling project
+- `XPT2046` touch 
 
-Pins baked into `src/main.cpp`:
+Pins baked into `src/DisplayConfig.h`:
 
 | Signal | Pin |
 | --- | --- |
@@ -25,7 +24,7 @@ Pins baked into `src/main.cpp`:
 | Touch MISO | 39 |
 | Touch CS | 33 |
 
-If you later change board variants, update the `LGFX` config block in `src/main.cpp`.
+If you have a different board variant, update the `LGFX` config block in `src/DisplayConfig.h`.
 
 ## Build and upload
 
