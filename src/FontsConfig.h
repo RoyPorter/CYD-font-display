@@ -1,6 +1,10 @@
 #pragma once
 
 #include <LovyanGFX.hpp>
+#include "Michroma9pt7b.h"
+#include "Michroma12pt7b.h"
+#include "Michroma18pt7b.h"
+#include "Michroma24pt7b.h"
 
 struct FontCandidate {
   const char* name;
@@ -166,6 +170,13 @@ const FontCandidate keFontTWCandidates[] = {
     {"TW_16", &fonts::efontTW_16},
 };
 
+const FontCandidate kMichromaCandidates[] = {
+    {"Michroma24", (const lgfx::IFont*)&Michroma_Regular24pt8b},
+    {"Michroma18", (const lgfx::IFont*)&Michroma_Regular18pt8b},
+    {"Michroma12", (const lgfx::IFont*)&Michroma_Regular12pt8b},
+    {"Michroma9",  (const lgfx::IFont*)&Michroma_Regular9pt8b},
+};
+
 const FontGroup kFontGroups[] = {
     {"Built-in", 0xFFE0, kBuiltinCandidates,
      sizeof(kBuiltinCandidates) / sizeof(kBuiltinCandidates[0])},
@@ -201,4 +212,6 @@ const FontGroup kFontGroups[] = {
      sizeof(kYellowtailCandidates) / sizeof(kYellowtailCandidates[0])},
     {"Ascii Fix", 0xCE79, kAsciiCandidates,
      sizeof(kAsciiCandidates) / sizeof(kAsciiCandidates[0])},
+    {"Michroma", 0x07FF, kMichromaCandidates,
+     sizeof(kMichromaCandidates) / sizeof(kMichromaCandidates[0])},
 };

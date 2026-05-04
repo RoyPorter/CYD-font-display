@@ -19,10 +19,9 @@ constexpr uint16_t kHintText = 0xBDF7;
 
 LGFX lcd;
 
-// Font configs are included from FontsConfig.h
-
-ResolvedFont resolvedFonts[sizeof(kFontGroups) / sizeof(kFontGroups[0])] = {};
-constexpr size_t kFontCount = sizeof(kFontGroups) / sizeof(kFontGroups[0]);
+constexpr size_t kMaxFontEntries = 64;
+ResolvedFont resolvedFonts[kMaxFontEntries];
+size_t kFontCount = 0;
 
 size_t currentFontIndex = 0;
 bool touchLatched = false;
@@ -41,50 +40,15 @@ uint16_t charWidth(char c) {
   return max<uint16_t>(width, 1);
 }
 
-bool fontFits(const lgfx::IFont* font) {
-  lcd.setFont(font);
-
-  const int16_t left = kMargin;
-  const int16_t right = bodyRight();
-  const int16_t bottom = bodyBottom();
-  const int16_t lineAdvance = max<int16_t>(1, lcd.fontHeight());
-
-  int16_t cursorX = left;
-  int16_t cursorY = bodyTop();
-
-  for (uint16_t c = 32; c <= 255; ++c) {
-    const uint16_t width = charWidth(static_cast<char>(c));
-    if (cursorX + width > right) {
-      cursorX = left;
-      cursorY += lineAdvance;
-    }
-
-    if (cursorY + lineAdvance > bottom) {
-      return false;
-    }
-
-    cursorX += width;
-  }
-
-  return true;
-}
-
-ResolvedFont selectLargestFittingFont(const FontGroup& group) {
-  const FontCandidate* fallback = &group.candidates[group.candidateCount - 1];
-
-  for (size_t i = 0; i < group.candidateCount; ++i) {
-    if (fontFits(group.candidates[i].font)) {
-      return {group.name, group.candidates[i].name, group.candidates[i].font,
-              group.color};
-    }
-  }
-
-  return {group.name, fallback->name, fallback->font, group.color};
-}
-
 void resolveFonts() {
-  for (size_t i = 0; i < kFontCount; ++i) {
-    resolvedFonts[i] = selectLargestFittingFont(kFontGroups[i]);
+  kFontCount = 0;
+  const size_t groupCount = sizeof(kFontGroups) / sizeof(kFontGroups[0]);
+  for (size_t i = 0; i < groupCount && kFontCount < kMaxFontEntries; ++i) {
+    const FontGroup& g = kFontGroups[i];
+    for (size_t j = 0; j < g.candidateCount && kFontCount < kMaxFontEntries; ++j) {
+      resolvedFonts[kFontCount++] = {g.name, g.candidates[j].name,
+                                     g.candidates[j].font, g.color};
+    }
   }
 }
 
@@ -94,7 +58,10 @@ void drawHeader(const ResolvedFont& entry) {
 
   lcd.setFont(&fonts::Font0);
   lcd.setTextColor(kHeaderText, kHeaderBackground);
-  lcd.drawString(entry.selectedName, kMargin, 3);
+
+  char label[48];
+  snprintf(label, sizeof(label), "%s / %s", entry.groupName, entry.selectedName);
+  lcd.drawString(label, kMargin, 3);
 
   const char* hint = "tap";
   lcd.setTextColor(kHintText, kHeaderBackground);
